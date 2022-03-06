@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="info" name="spring-boot-log-to-kafka-example" packages="io.woolford">
-
+<Configuration status="info" name="spring-boot-log-to-kafka-example" packages="com.chenyh">
+    <Properties>
+        <property name="applicationName">${spring:spring.application.name}</property>
+    </Properties>
 
     <!-- Log4J2 JSONLayout objectMessageAsJsonObject not exposed through SLF4j 10/2020 -->
     <Appenders>
@@ -11,24 +13,30 @@
 
         <!-- Kafka Logging Appender forwards all non audit to kafka -->
         <!-- JSONLayout logs with default logging fields , message is a single JSON field -->
+<!--        <Kafka name="kafkaLogAppender" topic="java-log">-->
+<!--            <JSONLayout />-->
+<!--            <Property name="bootstrap.servers">127.0.0.1:9093</Property>-->
+<!--            <MarkerFilter marker="${audit.logmarker}" onMatch="DENY" onMismatch="ACCEPT" />-->
+<!--        </Kafka>-->
+
         <Kafka name="kafkaLogAppender" topic="java-log">
-            <JSONLayout />
+            <!-- Add custom filed spanId and traceId -->
+            <JSONLayout>
+                <KeyValuePair key="applicationName" value="${applicationName}"/>
+                <KeyValuePair key="host" value="${env:hostName}"/>
+                <KeyValuePair key="hostIp" value="${hostIp}"/>
+                <KeyValuePair key="spanId" value="${ctx:spanId}"/>
+                <KeyValuePair key="traceId" value="${ctx:traceId}"/>
+            </JSONLayout>
             <Property name="bootstrap.servers">127.0.0.1:9093</Property>
             <MarkerFilter marker="${audit.logmarker}" onMatch="DENY" onMismatch="ACCEPT" />
         </Kafka>
 
         <Console name="stdout" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} stdout %highlight{%-5p} [%-7t] %F:%L - %m%n" />
+            <PatternLayout pattern="%d{YYYY-MM-DD HH:mm:ss.SSS} %highlight{%-5p} [${applicationName},%X{traceId},%X{spanId},%X{spanExportable}] [%-7t] %F:%L - %m%n" />
             <MarkerFilter marker="${audit.logmarker}" onMatch="DENY" onMismatch="ACCEPT" />
         </Console>
 
-        <Console name="stderr" target="SYSTEM_ERR">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} %highlight{stderr} %highlight{%-5p} [%-7t] %F:%L - %m%n" />
-            <Filters>
-                <ThresholdFilter level="WARN" onMatch="ACCEPT" />
-                <MarkerFilter marker="${audit.logmarker}" onMatch="DENY" onMismatch="ACCEPT" />
-            </Filters>
-        </Console>
 
     </Appenders>
     <Loggers>

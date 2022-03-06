@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,8 +18,13 @@ public class DemoApplication {
 
 	@RequestMapping("/")
 	public String home() {
-		logger.error("-------------");
+		logger.error("-------------" );
 		return "Hello Docker World";
+	}
+
+	@RequestMapping("error/{message}")
+	public String error(@PathVariable String message){
+		throw new NullPointerException(message);
 	}
 
 	public static void main(String[] args) {
