@@ -27,6 +27,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	// Log4J read spring properties
 	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+	// Send log to Kafka
 	implementation 'org.apache.kafka:kafka-log4j-appender:3.1.0'
 	implementation 'org.apache.logging.log4j:log4j-spring-boot:2.17.0'
 	implementation'org.springframework.cloud:spring-cloud-starter-sleuth'
